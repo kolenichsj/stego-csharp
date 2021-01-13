@@ -1,0 +1,8 @@
+Hide in plain site.
+
+Usage: 
+To generate an overt HTML file with a covert file embedded in it
+  hiHTML.exe "path/to/overtSource.html" "path/to/overtToGenerate.html"  "path/to/covertFile"
+
+To extract an embedded file from an overt HTML file
+  hiHTML.exe "path/to/overtGenerated.html" "path/to/covertFile"
