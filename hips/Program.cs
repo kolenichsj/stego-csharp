@@ -4,6 +4,7 @@ using inv = System.CommandLine.Invocation;
 
 namespace hips
 {
+#nullable enable
     class Program
     {
         static int Main(string[] args)
@@ -15,7 +16,8 @@ namespace hips
                     new Command("docx", "Modify DOCX file with covert data inserted")
                     {
                         new Argument<string>("documentPath", "Path to source document."),
-                        new Argument<string>("covertText", "Covert text to insert.")
+                        new Argument<string>("covertText", "Covert text to insert."),
+                        new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
                     }.WithHandler(new Action<string,string>((documentPath, covertText) => {
                         hipsDOCX.insertText(documentPath, covertText);
                       }))
@@ -28,10 +30,11 @@ namespace hips
                         {
                             new Argument<string>("sourceDocumentPath", "Path to source document."),
                             new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
-                            new Argument<string>("covertText", "Covert text to insert.")
-                        }.WithHandler(new Action<string,string,string>((documentPath, destinationDocumentPath, covertText) => 
+                            new Argument<string>("covertText", "Covert text to insert."),
+                            new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
+                        }.WithHandler(new Action<string,string,string,string?>((documentPath, destinationDocumentPath, covertText,hipsNamespace) =>
                             {
-                                hipsDOCX.insertText(documentPath,destinationDocumentPath, covertText);
+                                hipsDOCX.insertText(documentPath,destinationDocumentPath, covertText,hipsNamespace);
                             })),
                         new Command("html", "Create HTML file with covert data inserted")
                         {
@@ -47,10 +50,11 @@ namespace hips
                         new Command("docx", "Create DOCX file with covert data inserted")
                         {
                             new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
-                            new Argument<string>("covertText", "Covert text to insert.")
-                        }.WithHandler(new Action<string,string>((destinationDocumentPath, covertText) => 
+                            new Argument<string>("covertText", "Covert text to insert."),
+                            new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
+                        }.WithHandler(new Action<string,string,string?>((destinationDocumentPath, covertText,hipsNamespace) =>
                             {
-                                hipsDOCX.createFileInsertText(destinationDocumentPath, covertText);
+                                hipsDOCX.createFileInsertText(destinationDocumentPath, covertText,hipsNamespace);
                             }))
                     }
                 },
@@ -58,9 +62,10 @@ namespace hips
                 {
                     new Command("docx", "Extract data from DOCX file")
                     {
-                        new Argument<string>("overtDOCX", "Path to source document.")
-                    }.WithHandler(new Action<string,IConsole>((overtDOCX, console)=>{
-                        string val = hipsDOCX.getText(overtDOCX);
+                        new Argument<string>("overtDOCX", "Path to source document."),
+                        new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
+                    }.WithHandler(new Action<string,string,IConsole>((overtDOCX,hipsNamespace, console)=>{
+                        string val = hipsDOCX.getText(overtDOCX,hipsNamespace);
                         console.Out.Write(val);
                     })),
                     new Command("html", "Extract data from HTML file")
@@ -76,6 +81,7 @@ namespace hips
             return cmd.Invoke(args);
         }
     }
+#nullable disable
 
     static class extensions
     {
