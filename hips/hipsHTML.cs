@@ -1,13 +1,22 @@
-using System;
 using System.IO;
 
 namespace hips
 {
+    /// <summary>
+    /// Class to process HTML files to insert or retrieve covert data.
+    /// Binary values are encoded with tabs (0) and spaces (1)
+    /// </summary>
     public static class hipsHTML
     {
         private const byte ONE = 32; // space
         private const byte ZERO = 9; // tab
 
+        /// <summary>
+        /// Insert binary data in HTML file
+        /// </summary>
+        /// <param name="overt_inPath"></param>
+        /// <param name="overt_outPath"></param>
+        /// <param name="covert_Path"></param>
         public static void hideInHTML(string overt_inPath, string overt_outPath, string covert_Path)
         {
             using (FileStream overt_in = File.OpenRead(overt_inPath))

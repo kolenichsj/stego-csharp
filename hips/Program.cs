@@ -12,7 +12,7 @@ namespace hips
             {
                 new Command("insert", "Insert covert data into overt file")
                 {
-                    new Command("docx", "Create DOCX file with covert data inserted")
+                    new Command("docx", "Modify DOCX file with covert data inserted")
                     {
                         new Argument<string>("documentPath", "Path to source document."),
                         new Argument<string>("covertText", "Covert text to insert.")
@@ -22,24 +22,39 @@ namespace hips
                 },
                 new Command("generate", "Create overt file with covert data inserted")
                 {
-                    new Command("docx", "Create DOCX file with covert data inserted")
+                    new Command("from-existing", "Create overt file with covert data inserted using existing file")
                     {
-                        new Argument<string>("sourceDocumentPath", "Path to source document."),
-                        new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
-                        new Argument<string>("covertText", "Covert text to insert.")
-                    }.WithHandler(new Action<string,string,string>((documentPath, destinationDocumentPath, covertText) => {
-                        hipsDOCX.insertText(documentPath,destinationDocumentPath, covertText);
-                      })),
-                    new Command("html", "Create HTML file with covert data inserted")
+                        new Command("docx", "Create DOCX file with covert data inserted")
+                        {
+                            new Argument<string>("sourceDocumentPath", "Path to source document."),
+                            new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
+                            new Argument<string>("covertText", "Covert text to insert.")
+                        }.WithHandler(new Action<string,string,string>((documentPath, destinationDocumentPath, covertText) => 
+                            {
+                                hipsDOCX.insertText(documentPath,destinationDocumentPath, covertText);
+                            })),
+                        new Command("html", "Create HTML file with covert data inserted")
+                        {
+                            new Argument<string>("sourceHTML", "Path to source HTML."),
+                            new Argument<string>("destinationHTML", "Path of HTML to generate."),
+                            new Argument<string>("covertPath", "Path to covert file to insert.")
+                        }.WithHandler(new Action<string,string,string>((srcHTML, outHTML, srcBin) => {
+                            hipsHTML.hideInHTML(srcHTML,outHTML,srcBin);
+                        }))
+                    },
+                    new Command("new", "Create overt file with covert data inserted")
                     {
-                        new Argument<string>("sourceHTML", "Path to source HTML."),
-                        new Argument<string>("destinationHTML", "Path of HTML to generate."),
-                        new Argument<string>("covertPath", "Path to covert file to insert.")
-                    }.WithHandler(new Action<string,string,string>((srcHTML, outHTML, srcBin) => {
-                        hipsHTML.hideInHTML(srcHTML,outHTML,srcBin);
-                     }))
+                        new Command("docx", "Create DOCX file with covert data inserted")
+                        {
+                            new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
+                            new Argument<string>("covertText", "Covert text to insert.")
+                        }.WithHandler(new Action<string,string>((destinationDocumentPath, covertText) => 
+                            {
+                                hipsDOCX.createFileInsertText(destinationDocumentPath, covertText);
+                            }))
+                    }
                 },
-                new Command("extract", "extract covert data from overt file")
+                new Command("extract", "Extract covert data from overt file")
                 {
                     new Command("docx", "Extract data from DOCX file")
                     {
