@@ -50,13 +50,13 @@ namespace hips
                                 }
 
                                 overt_out.WriteByte(((nextcovbyte & mask) == 0) ? ZERO : ONE);
-                                overt_out.FlushAsync();
+                                overt_out.Flush();
                                 mask = mask << 1;
                             }
                             else
                             {
                                 overt_out.WriteByte((byte)nextchar);
-                                overt_out.FlushAsync();
+                                overt_out.Flush();
                             }
                         }
                     }
