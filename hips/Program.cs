@@ -64,10 +64,17 @@ namespace hips
                     {
                         new Argument<string>("overtDOCX", "Path to source document."),
                         new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
-                    }.WithHandler(new Action<string,string,IConsole>((overtDOCX,hipsNamespace, console)=>{
-                        string val = hipsDOCX.getText(overtDOCX,hipsNamespace);
-                        console.Out.Write(val);
-                    })),
+                    }.WithHandler(new Action<string,string,IConsole>((overtDOCX,hipsNamespace, console)=>
+                        {
+                            try
+                            {
+                                console.Out.Write(hipsDOCX.getText(overtDOCX,hipsNamespace));
+                            }
+                            catch (Exception ex)
+                            {
+                                console.Error.Write(ex.Message);
+                            }
+                        })),
                     new Command("html", "Extract data from HTML file")
                     {
                         new Argument<string>("overtHTML", "Path to overt HTML."),
