@@ -7,10 +7,25 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/hips/hips.csproj",
+                "${workspaceFolder}",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "RunTests",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "test",
+                "${workspaceFolder}"
+            ],
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel":"dedicated"
+            },
             "problemMatcher": "$msCompile"
         },
         {
@@ -19,7 +34,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/hips/hips.csproj",
+                "${workspaceFolder}",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +47,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/hips/hips.csproj",
+                "${workspaceFolder}",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
