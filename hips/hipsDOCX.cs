@@ -114,7 +114,7 @@ namespace hips
         {
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
 
-            using (WordprocessingDocument wdDoc = WordprocessingDocument.Open(docxPath, true))
+            using (WordprocessingDocument wdDoc = WordprocessingDocument.Open(docxPath, false))
             {
                 NameTable nt = new NameTable();
                 XmlNamespaceManager nsManager = new XmlNamespaceManager(nt);
@@ -129,7 +129,7 @@ namespace hips
 
                 foreach (XmlNode hipsText in hipsNodes)
                 {
-                    sr.WriteLine(hipsText.InnerText);
+                    sr.Write(hipsText.InnerText);
                 }
 
                 return sr.GetStringBuilder().ToString();
