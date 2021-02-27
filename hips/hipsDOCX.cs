@@ -100,7 +100,7 @@ namespace hips
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
             {
                 MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
-                mainPart.Document = new wp.Document(xdoc.InnerXml);
+                mainPart.Document = new wp.Document(xdoc.OuterXml);
             }
         }
 
