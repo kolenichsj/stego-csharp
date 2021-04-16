@@ -37,7 +37,7 @@ namespace hips
                             overt_out.Write(sizeinfo);
                         }
 
-                        while (overt_in.Position < overt_in.Length || covert_in.Position < covert_in.Length)
+                        while (overt_in.Position < overt_in.Length || covert_in.Position < covert_in.Length || mask != 256)
                         {
                             nextchar = overt_in.ReadByte();
 
@@ -80,7 +80,7 @@ namespace hips
                     int bitcount = 0;
                     int nextchar = 0;
 
-                    while (bitcount < totalbits && overt_in.CanRead)
+                    while (bitcount < totalbits && overt_in.CanRead && nextchar >= 0)
                     {
                         nextchar = overt_in.ReadByte();
                         if (nextchar == ONE)
@@ -98,6 +98,7 @@ namespace hips
                         if ((mask & 256) == 256)
                         {
                             covert_out.WriteByte(nextbyte);
+                            covert_out.Flush();
                             mask = 1;
                             nextbyte = 0;
                         }
