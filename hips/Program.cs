@@ -32,17 +32,17 @@ namespace hips
                             new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
                             new Argument<string>("covertText", "Covert text to insert."),
                             new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
-                        }.WithHandler(new Action<string,string,string,string?>((documentPath, destinationDocumentPath, covertText,hipsNamespace) =>
+                        }.WithHandler(new Action<string,string,string,string?>((sourceDocumentPath, destinationDocumentPath, covertText,hipsNamespace) =>
                             {
-                                hipsDOCX.insertText(documentPath,destinationDocumentPath, covertText,hipsNamespace);
+                                hipsDOCX.insertText(sourceDocumentPath,destinationDocumentPath, covertText,hipsNamespace);
                             })),
                         new Command("html", "Create HTML file with covert data inserted")
                         {
                             new Argument<string>("sourceHTML", "Path to source HTML."),
                             new Argument<string>("destinationHTML", "Path of HTML to generate."),
                             new Argument<string>("covertPath", "Path to covert file to insert.")
-                        }.WithHandler(new Action<string,string,string>((srcHTML, outHTML, srcBin) => {
-                            hipsHTML.hideInHTML(srcHTML,outHTML,srcBin);
+                        }.WithHandler(new Action<string,string,string>((sourceHTML, destinationHTML, covertPath) => {
+                            hipsHTML.hideInHTML(sourceHTML,destinationHTML,covertPath);
                         }))
                     },
                     new Command("new", "Create overt file with covert data inserted")
