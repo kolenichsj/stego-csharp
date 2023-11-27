@@ -2,7 +2,7 @@ using System.IO;
 using System.Xml;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using wp = DocumentFormat.OpenXml.Wordprocessing;
+using Wp = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace hips
 {
@@ -60,7 +60,7 @@ namespace hips
         /// <param name="docPartText">A reader that will provide the XML of the Document part</param>
         /// <param name="covertText">Text to be inserted</param>
         /// <returns>Returns a DocumentFormat.OpenXml.Wordprocessing.Document object that has covert string inserted</returns>
-        private static wp.Document generateDocBodyXML(string hipsNamespace, TextReader docPartText, string covertText)
+        private static Wp.Document generateDocBodyXML(string hipsNamespace, TextReader docPartText, string covertText)
         {
             NameTable nt = new NameTable(); // Manage namespaces to perform XPath queries.
             XmlNamespaceManager nsManager = new XmlNamespaceManager(nt);
@@ -79,7 +79,7 @@ namespace hips
             XmlNode firstParagraph = xdoc.SelectSingleNode("/w:document[1]/w:body[1]/w:p[1]", nsManager); //get first paragraph in document element
             firstParagraph.AppendChild(hiContent);
 
-            return new wp.Document(xdoc.InnerXml);
+            return new Wp.Document(xdoc.InnerXml);
         }
 
         /// <summary>
@@ -90,17 +90,17 @@ namespace hips
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
         public static void createFileInsertText(string filePath, string covertText, string hipsNamespace = "")
         {
-            var blankDoc = new wp.Document(
-                new wp.Body(
-                    new wp.Paragraph(
-                        new wp.Run())));
+            var blankDoc = new Wp.Document(
+                new Wp.Body(
+                    new Wp.Paragraph(
+                        new Wp.Run())));
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
             var xdoc = generateDocBodyXML(hipsNamespace, new StringReader(blankDoc.OuterXml), covertText);
 
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
             {
                 MainDocumentPart mainPart = wordDocument.AddMainDocumentPart();
-                mainPart.Document = new wp.Document(xdoc.OuterXml);
+                mainPart.Document = new Wp.Document(xdoc.OuterXml);
             }
         }
 

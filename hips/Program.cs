@@ -1,6 +1,6 @@
 ﻿using System;
 using System.CommandLine;
-using inv = System.CommandLine.Invocation;
+using Inv = System.CommandLine.Invocation;
 
 namespace hips
 {
@@ -90,11 +90,11 @@ namespace hips
     }
 #nullable disable
 
-    static class extensions
+    static class Extensions
     {
         public static Command WithHandler(this Command command, Delegate handlerFunc)
         {
-            command.Handler = inv.CommandHandler.Create(handlerFunc!);
+            command.Handler = Inv.CommandHandler.Create(handlerFunc!);
             return command;
         }
     }

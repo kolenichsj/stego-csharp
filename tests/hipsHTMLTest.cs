@@ -25,7 +25,7 @@ namespace tests
             FileStream file1 = new FileStream(overt_outPath, FileMode.Open, FileAccess.Read);
             FileStream file2 = new FileStream(System.IO.Path.Combine(testResourcesDir, "tstCompare.html"), FileMode.Open, FileAccess.Read);
 
-            Assert.True(utils.FileCompare(file1, file2));
+            Assert.True(Utils.FileCompare(file1, file2));
         }
     }
 }

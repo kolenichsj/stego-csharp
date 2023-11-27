@@ -1,6 +1,6 @@
 using System.IO;
 
-public static class utils
+public static class Utils
 {
         /// <summary>
         /// Executes binary compares of two file streams
