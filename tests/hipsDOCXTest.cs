@@ -21,7 +21,7 @@ namespace tests
             var testcase_path = Path.Combine(testResourcesDir, "testcase" + testId.ToString() + ".docx");
             string extract_text = hips.hipsDOCX.getText(testcase_path, hipsNamespace);
 
-            Assert.AreEqual(extract_text, covertText);
+            Assert.That(covertText, Is.EqualTo(extract_text));
         }
 
         static object[] hideTextInDOC =
