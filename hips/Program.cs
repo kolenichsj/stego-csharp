@@ -8,14 +8,14 @@ namespace hips
     {
         static int Main(string[] args)
         {
-            RootCommand cmd = new RootCommand
+            var cmd = new RootCommand
             {
                new Command("insert", "Insert covert data into overt file")
                {
                    new Command("docx", "Modify DOCX file with covert data inserted")
                    {
-                       new Argument<FileInfo>("documentPath"){Description = "Path to source document."},
-                       new Argument<string>("covertText") {Description = "Covert text to insert."},
+                       new Argument<FileInfo>("documentPath"){ Description = "Path to source document."},
+                       new Argument<string>("covertText") { Description = "Covert text to insert."},
                        new Option<string?>("--hipsNamespace", ["-ns"]){ Description = "The namespace for covert text in OpenXML file." }
                    }
                    .WithAction(parseResult =>
@@ -130,7 +130,7 @@ namespace hips
 
                            try
                            {
-                           hipsDOCX.createFileInsertText(destinationDocumentPath.FullName, covertText,hipsNamespace?? string.Empty);
+                           hipsDOCX.CreateFileInsertText(destinationDocumentPath.FullName, covertText,hipsNamespace?? string.Empty);
                                return 0;
                            }
                            catch (Exception ex)
@@ -160,7 +160,7 @@ namespace hips
 
                        try
                        {
-                           Console.Out.Write(hipsDOCX.getText(overtDOCX.FullName,hipsNamespace??string.Empty));
+                           Console.Out.Write(hipsDOCX.GetText(overtDOCX.FullName,hipsNamespace??string.Empty));
                            return 0;
                        }
                        catch (Exception ex)
@@ -182,10 +182,10 @@ namespace hips
                            Console.Error.WriteLine("Value for argument overtDOCX is required");
                            return 1;
                        }
-                       
+
                        try
                            {
-                       hipsHTML.getFromHTML(overtHTML.FullName,covertPath.FullName);        
+                       hipsHTML.getFromHTML(overtHTML.FullName,covertPath.FullName);
                                return 0;
                            }
                            catch (Exception ex)

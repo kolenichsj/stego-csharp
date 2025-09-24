@@ -92,7 +92,7 @@ namespace hips
         /// <param name="filePath">Path and filename to create</param>
         /// <param name="covertText">Text to be inserted</param>
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
-        public static void createFileInsertText(string filePath, string covertText, string hipsNamespace = "")
+        public static void CreateFileInsertText(string filePath, string covertText, string hipsNamespace = "")
         {
             var blankDoc = new Wp.Document(
                 new Wp.Body(
@@ -114,7 +114,7 @@ namespace hips
         /// <param name="docxPath"></param>
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
         /// <returns>Any text found in "t" element in the hipsNamespace</returns>
-        public static string getText(string docxPath, string hipsNamespace = "")
+        public static string GetText(string docxPath, string hipsNamespace = "")
         {
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
 
@@ -125,7 +125,7 @@ namespace hips
             nsManager.AddNamespace("hips", hipsNamespace);
             nsManager.AddNamespace("mc", mcNamespace);
 
-            XmlDocument xdoc = new XmlDocument(nt);
+            var xdoc = new XmlDocument(nt);
 
             if (wdDoc.MainDocumentPart == null)
             {
