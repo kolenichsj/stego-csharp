@@ -7,7 +7,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/hips/bin/Debug/net5.0/hips.dll",
+            "program": "${workspaceFolder}/hips/bin/Debug/net8.0/hips.dll",
             "cwd": "${workspaceFolder}",
             "console": "integratedTerminal",
             "stopAtEntry": false
@@ -17,6 +17,16 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Debug - with args",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "${workspaceFolder}/hips/bin/Debug/net8.0/hips.exe",
+            "preLaunchTask": "build",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "args": "-?"
         }
     ]
 }
