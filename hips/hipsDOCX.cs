@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Xml;
 using DocumentFormat.OpenXml;
@@ -21,14 +22,13 @@ namespace hips
         /// <param name="srcDocPath">Path of document to modify</param>
         /// <param name="covertText">Text to be inserted</param>
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
-        public static void insertText(string srcDocPath, string covertText, string hipsNamespace = "")
+        public static void InsertText(string srcDocPath, string covertText, string hipsNamespace = "")
         {
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
 
-            using (WordprocessingDocument wdDoc = WordprocessingDocument.Open(srcDocPath, true))
-            {
-                wdDoc.MainDocumentPart.Document = generateDocBodyXML(hipsNamespace, new StringReader(wdDoc.MainDocumentPart.Document.OuterXml), covertText);
-            }
+            using WordprocessingDocument wdDoc = WordprocessingDocument.Open(srcDocPath, true);
+            var mainPart = wdDoc.MainDocumentPart ?? wdDoc.AddMainDocumentPart();
+            mainPart.Document = GenerateDocBodyXML(hipsNamespace, new StringReader(mainPart.Document.OuterXml), covertText);
         }
 
         /// <summary>
@@ -38,19 +38,19 @@ namespace hips
         /// <param name="dstDocPath">Path of document to create</param>
         /// <param name="covertText">Text to be inserted</param>
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
-        public static void insertText(string srcDocPath, string dstDocPath, string covertText, string hipsNamespace = "")
+        public static void InsertText(string srcDocPath, string dstDocPath, string covertText, string hipsNamespace = "")
         {
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
             StringReader docPartReader;
             using (WordprocessingDocument wdDocSrc = WordprocessingDocument.Open(srcDocPath, false))
             {
-                docPartReader = new StringReader(wdDocSrc.MainDocumentPart.Document.OuterXml);
+                var mainPart = wdDocSrc.MainDocumentPart ?? wdDocSrc.AddMainDocumentPart();
+                docPartReader = new StringReader(mainPart.Document.OuterXml);
             }
 
-            using (WordprocessingDocument wdDocDest = WordprocessingDocument.Open(dstDocPath, true))
-            {
-                wdDocDest.MainDocumentPart.Document = generateDocBodyXML(hipsNamespace, docPartReader, covertText);
-            }
+            using WordprocessingDocument wdDocDest = WordprocessingDocument.Create(dstDocPath, WordprocessingDocumentType.Document);
+            var docmain = wdDocDest.AddMainDocumentPart();
+            docmain.Document = GenerateDocBodyXML(hipsNamespace, docPartReader, covertText);
         }
 
         /// <summary>
@@ -60,23 +60,27 @@ namespace hips
         /// <param name="docPartText">A reader that will provide the XML of the Document part</param>
         /// <param name="covertText">Text to be inserted</param>
         /// <returns>Returns a DocumentFormat.OpenXml.Wordprocessing.Document object that has covert string inserted</returns>
-        private static Wp.Document generateDocBodyXML(string hipsNamespace, TextReader docPartText, string covertText)
+        private static Wp.Document GenerateDocBodyXML(string hipsNamespace, TextReader docPartText, string covertText)
         {
-            NameTable nt = new NameTable(); // Manage namespaces to perform XPath queries.
-            XmlNamespaceManager nsManager = new XmlNamespaceManager(nt);
+            var nt = new NameTable(); // Manage namespaces to perform XPath queries.
+            var nsManager = new XmlNamespaceManager(nt);
             nsManager.AddNamespace("w", wordmlNamespace);
             nsManager.AddNamespace("hips", hipsNamespace);
             nsManager.AddNamespace("mc", mcNamespace);
 
-            XmlDocument xdoc = new XmlDocument(nt);
+            var xdoc = new XmlDocument(nt);
             xdoc.Load(docPartText);
+            if (xdoc.DocumentElement == null)
+            {
+                throw new InvalidOperationException("DocumentElement was null");
+            }
             XmlNode mcIgnorable = xdoc.DocumentElement.Attributes.GetNamedItem("Ignorable", mcNamespace) ?? xdoc.CreateAttribute("mc", "Ignorable", mcNamespace);
             mcIgnorable.Value = (mcIgnorable.Value + " " + nsManager.LookupPrefix(hipsNamespace)).TrimStart();
             xdoc.DocumentElement.Attributes.SetNamedItem(mcIgnorable);
 
             XmlNode hiContent = xdoc.CreateNode(XmlNodeType.Element, "hips", "t", hipsNamespace);
             hiContent.InnerText = covertText;
-            XmlNode firstParagraph = xdoc.SelectSingleNode("/w:document[1]/w:body[1]/w:p[1]", nsManager); //get first paragraph in document element
+            var firstParagraph = xdoc.SelectSingleNode("/w:document[1]/w:body[1]/w:p[1]", nsManager) ?? throw new InvalidOperationException("Unable to find first paragraph"); //get first paragraph in document element
             firstParagraph.AppendChild(hiContent);
 
             return new Wp.Document(xdoc.InnerXml);
@@ -88,14 +92,14 @@ namespace hips
         /// <param name="filePath">Path and filename to create</param>
         /// <param name="covertText">Text to be inserted</param>
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
-        public static void createFileInsertText(string filePath, string covertText, string hipsNamespace = "")
+        public static void CreateFileInsertText(string filePath, string covertText, string hipsNamespace = "")
         {
             var blankDoc = new Wp.Document(
                 new Wp.Body(
                     new Wp.Paragraph(
                         new Wp.Run())));
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
-            var xdoc = generateDocBodyXML(hipsNamespace, new StringReader(blankDoc.OuterXml), covertText);
+            var xdoc = GenerateDocBodyXML(hipsNamespace, new StringReader(blankDoc.OuterXml), covertText);
 
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
             {
@@ -110,30 +114,35 @@ namespace hips
         /// <param name="docxPath"></param>
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
         /// <returns>Any text found in "t" element in the hipsNamespace</returns>
-        public static string getText(string docxPath, string hipsNamespace = "")
+        public static string GetText(string docxPath, string hipsNamespace = "")
         {
             hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
 
-            using (WordprocessingDocument wdDoc = WordprocessingDocument.Open(docxPath, false))
+            using WordprocessingDocument wdDoc = WordprocessingDocument.Open(docxPath, false);
+            NameTable nt = new NameTable();
+            XmlNamespaceManager nsManager = new XmlNamespaceManager(nt);
+            nsManager.AddNamespace("w", wordmlNamespace);
+            nsManager.AddNamespace("hips", hipsNamespace);
+            nsManager.AddNamespace("mc", mcNamespace);
+
+            var xdoc = new XmlDocument(nt);
+
+            if (wdDoc.MainDocumentPart == null)
             {
-                NameTable nt = new NameTable();
-                XmlNamespaceManager nsManager = new XmlNamespaceManager(nt);
-                nsManager.AddNamespace("w", wordmlNamespace);
-                nsManager.AddNamespace("hips", hipsNamespace);
-                nsManager.AddNamespace("mc", mcNamespace);
-
-                XmlDocument xdoc = new XmlDocument(nt);
-                xdoc.Load(new StringReader(wdDoc.MainDocumentPart.Document.OuterXml));
-                XmlNodeList hipsNodes = xdoc.SelectNodes("//hips:t", nsManager);
-                StringWriter sr = new StringWriter();
-
-                foreach (XmlNode hipsText in hipsNodes)
-                {
-                    sr.Write(hipsText.InnerText);
-                }
-
-                return sr.GetStringBuilder().ToString();
+                throw new InvalidOperationException("MainDocumentPart was null");
             }
+
+            xdoc.Load(new StringReader(wdDoc.MainDocumentPart.Document.OuterXml));
+
+            var hipsNodes = xdoc.SelectNodes("//hips:t", nsManager) ?? throw new InvalidOperationException("SelectNodes resulted in null XmlNodeList");
+            var sr = new StringWriter();
+
+            foreach (XmlNode hipsText in hipsNodes)
+            {
+                sr.Write(hipsText.InnerText);
+            }
+
+            return sr.GetStringBuilder().ToString();
         }
     }
 }

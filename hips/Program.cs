@@ -1,101 +1,221 @@
 ﻿using System;
 using System.CommandLine;
-using Inv = System.CommandLine.Invocation;
+using System.IO;
 
 namespace hips
 {
-#nullable enable
     class Program
     {
         static int Main(string[] args)
         {
-            RootCommand cmd = new RootCommand
+            var cmd = new RootCommand
             {
-                new Command("insert", "Insert covert data into overt file")
-                {
-                    new Command("docx", "Modify DOCX file with covert data inserted")
-                    {
-                        new Argument<string>("documentPath", "Path to source document."),
-                        new Argument<string>("covertText", "Covert text to insert."),
-                        new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
-                    }.WithHandler(new Action<string,string>((documentPath, covertText) => {
-                        hipsDOCX.insertText(documentPath, covertText);
-                      }))
-                },
-                new Command("generate", "Create overt file with covert data inserted")
-                {
-                    new Command("from-existing", "Create overt file with covert data inserted using existing file")
-                    {
-                        new Command("docx", "Create DOCX file with covert data inserted")
-                        {
-                            new Argument<string>("sourceDocumentPath", "Path to source document."),
-                            new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
-                            new Argument<string>("covertText", "Covert text to insert."),
-                            new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
-                        }.WithHandler(new Action<string,string,string,string?>((sourceDocumentPath, destinationDocumentPath, covertText,hipsNamespace) =>
-                            {
-                                hipsDOCX.insertText(sourceDocumentPath,destinationDocumentPath, covertText,hipsNamespace);
-                            })),
-                        new Command("html", "Create HTML file with covert data inserted")
-                        {
-                            new Argument<string>("sourceHTML", "Path to source HTML."),
-                            new Argument<string>("destinationHTML", "Path of HTML to generate."),
-                            new Argument<string>("covertPath", "Path to covert file to insert.")
-                        }.WithHandler(new Action<string,string,string>((sourceHTML, destinationHTML, covertPath) => {
-                            hipsHTML.hideInHTML(sourceHTML,destinationHTML,covertPath);
-                        }))
-                    },
-                    new Command("new", "Create overt file with covert data inserted")
-                    {
-                        new Command("docx", "Create DOCX file with covert data inserted")
-                        {
-                            new Argument<string>("destinationDocumentPath", "Path of DOCX to generate."),
-                            new Argument<string>("covertText", "Covert text to insert."),
-                            new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
-                        }.WithHandler(new Action<string,string,string?>((destinationDocumentPath, covertText,hipsNamespace) =>
-                            {
-                                hipsDOCX.createFileInsertText(destinationDocumentPath, covertText,hipsNamespace);
-                            }))
-                    }
-                },
-                new Command("extract", "Extract covert data from overt file")
-                {
-                    new Command("docx", "Extract data from DOCX file")
-                    {
-                        new Argument<string>("overtDOCX", "Path to source document."),
-                        new Option<string?>(new[] { "--hipsNamespace", "-ns" }, "The namespace for covert text in OpenXML file.")
-                    }.WithHandler(new Action<string,string,IConsole>((overtDOCX,hipsNamespace, console)=>
-                        {
-                            try
-                            {
-                                console.Out.Write(hipsDOCX.getText(overtDOCX,hipsNamespace));
-                            }
-                            catch (Exception ex)
-                            {
-                                console.Error.Write(ex.Message);
-                            }
-                        })),
-                    new Command("html", "Extract data from HTML file")
-                    {
-                        new Argument<string>("overtHTML", "Path to overt HTML."),
-                        new Argument<string>("covertPath", "Path to extract covert file.")
-                    }.WithHandler(new Action<string,string>((overtHTML,covertPath) => {
-                            hipsHTML.getFromHTML(overtHTML,covertPath);
-                        }))
-                }
+               new Command("insert", "Insert covert data into overt file")
+               {
+                   new Command("docx", "Modify DOCX file with covert data inserted")
+                   {
+                       new Argument<FileInfo>("documentPath"){ Description = "Path to source document."},
+                       new Argument<string>("covertText") { Description = "Covert text to insert."},
+                       new Option<string?>("--hipsNamespace", ["-ns"]){ Description = "The namespace for covert text in OpenXML file." }
+                   }
+                   .WithAction(parseResult =>
+                   {
+                       var documentPath = parseResult.GetValue<FileInfo>("documentPath");
+                       var covertText = parseResult.GetValue<string>("covertText");
+                       var hipsNamespace = parseResult.GetValue<string>("--hipsNamespace");
+                       if (documentPath==null)
+                       {
+                           Console.Error.WriteLine("Value for argument documentPath is required");
+                           return 1;
+                       }
+
+                       if (string.IsNullOrEmpty(covertText))
+                       {
+                           Console.Error.WriteLine("Value for argument covertText is required");
+                           return 1;
+                       }
+
+                       try
+                       {
+                           hipsDOCX.InsertText(documentPath.FullName, covertText, hipsNamespace?? string.Empty);
+                           return 0;
+                       }
+                       catch (Exception ex)
+                       {
+                           Console.Error.Write(ex.Message);
+                           return 1;
+                       }
+                   })
+               },
+               new Command("generate", "Create overt file with covert data inserted")
+               {
+                   new Command("from-existing", "Create overt file with covert data inserted using existing file")
+                   {
+                       new Command("docx", "Create DOCX file with covert data inserted")
+                       {
+                           new Argument<FileInfo>("sourceDocumentPath") {Description = "Path to source document." },
+                           new Argument<FileInfo>("destinationDocumentPath"){Description = "Path of DOCX to generate." },
+                           new Argument<string>("covertText"){Description =  "Covert text to insert." },
+                           new Option<string?>("--hipsNamespace", ["-ns"]){Description ="The namespace for covert text in OpenXML file." }
+                       }
+                       .WithAction(parseResult => {
+                           var sourceDocumentPath = parseResult.GetValue<FileInfo>("sourceDocumentPath");
+                           var destinationDocumentPath = parseResult.GetValue<FileInfo>("destinationDocumentPath");
+                           var covertText = parseResult.GetValue<string>("covertText");
+                           var hipsNamespace = parseResult.GetValue<string>("--hipsNamespace");
+
+                           if (sourceDocumentPath==null ||destinationDocumentPath==null || string.IsNullOrEmpty(covertText))
+                           {
+                               Console.Error.WriteLine("Missing required value");
+                               return 1;
+                           }
+
+                           try
+                           {
+                               hipsDOCX.InsertText(sourceDocumentPath.FullName,destinationDocumentPath.FullName, covertText,hipsNamespace??string.Empty);
+                               return 0;
+                           }
+                           catch (Exception ex)
+                           {
+                               Console.Error.Write(ex.Message);
+                               return 1;
+                           }
+                       }),
+                       new Command("html", "Create HTML file with covert data inserted")
+                       {
+                           new Argument<FileInfo>("sourceHTML"){Description = "Path to source HTML." },
+                           new Argument<FileInfo>("destinationHTML"){Description = "Path of HTML to generate." },
+                           new Argument<FileInfo>("covertPath"){Description = "Path to covert file to insert." }
+                       }
+                       .WithAction(parseResult => {
+                           var sourceHTML = parseResult.GetValue<FileInfo>("sourceHTML");
+                           var destinationHTML = parseResult.GetValue<FileInfo>("destinationHTML");
+                           var covertPath = parseResult.GetValue<FileInfo>("covertPath");
+                           if (sourceHTML==null ||destinationHTML==null || covertPath==null)
+                           {
+                               Console.Error.WriteLine("Missing required value");
+                               return 1;
+                           }
+
+                           try
+                           {
+                            hipsHTML.hideInHTML(sourceHTML.FullName,destinationHTML.FullName,covertPath.FullName);
+                               return 0;
+                           }
+                           catch (Exception ex)
+                           {
+                               Console.Error.Write(ex.Message);
+                               return 1;
+                           }
+
+                       })
+                       },
+                   new Command("new", "Create overt file with covert data inserted")
+                   {
+                       new Command("docx", "Create DOCX file with covert data inserted")
+                       {
+                           new Argument<FileInfo>("destinationDocumentPath"){Description = "Path of DOCX to generate." },
+                           new Argument<string>("covertText"){Description = "Covert text to insert." },
+                           new Option<string?>("--hipsNamespace", ["-ns"] ){Description = "The namespace for covert text in OpenXML file."}
+                       }
+                       .WithAction(parseResult => {
+                           var destinationDocumentPath = parseResult.GetValue<FileInfo>("destinationDocumentPath");
+                           var covertText = parseResult.GetValue<string>("covertText");
+                           var hipsNamespace = parseResult.GetValue<string>("--hipsNamespace");
+                           if (destinationDocumentPath==null ||string.IsNullOrEmpty(covertText))
+                           {
+                               Console.Error.WriteLine("Missing required value");
+                               return 1;
+                           }
+
+                           try
+                           {
+                           hipsDOCX.CreateFileInsertText(destinationDocumentPath.FullName, covertText,hipsNamespace?? string.Empty);
+                               return 0;
+                           }
+                           catch (Exception ex)
+                           {
+                               Console.Error.Write(ex.Message);
+                               return 1;
+                           }
+                       })
+                   }
+               },
+               new Command("extract", "Extract covert data from overt file")
+               {
+                   new Command("docx", "Extract data from DOCX file")
+                   {
+                       new Argument<FileInfo>("overtDOCX"){Description = "Path to source document." },
+                       new Option<string?>("--hipsNamespace", ["-ns"]){Description = "The namespace for covert text in OpenXML file." }
+                   }
+                   .WithAction(parseResult => {
+                       var overtDOCX = parseResult.GetValue<FileInfo>("overtDOCX");
+                       var hipsNamespace = parseResult.GetValue<string>("--hipsNamespace");
+
+                       if (overtDOCX==null)
+                       {
+                           Console.Error.WriteLine("Value for argument overtDOCX is required");
+                           return 1;
+                       }
+
+                       try
+                       {
+                           Console.Out.Write(hipsDOCX.GetText(overtDOCX.FullName,hipsNamespace??string.Empty));
+                           return 0;
+                       }
+                       catch (Exception ex)
+                       {
+                           Console.Error.Write(ex.Message);
+                           return 1;
+                       }
+                   }),
+                   new Command("html", "Extract data from HTML file")
+                   {
+                       new Argument<FileInfo>("overtHTML"){Description = "Path to overt HTML." },
+                       new Argument<FileInfo>("covertPath"){Description = "Path to extract covert file." }
+                   }
+                  .WithAction(parseResult => {
+                       var overtHTML = parseResult.GetValue<FileInfo>("overtHTML");
+                       var covertPath = parseResult.GetValue<FileInfo>("covertPath");
+                       if (overtHTML==null || covertPath == null)
+                       {
+                           Console.Error.WriteLine("Value for argument overtDOCX is required");
+                           return 1;
+                       }
+
+                       try
+                           {
+                       hipsHTML.getFromHTML(overtHTML.FullName,covertPath.FullName);
+                               return 0;
+                           }
+                           catch (Exception ex)
+                           {
+                               Console.Error.Write(ex.Message);
+                               return 1;
+                           }
+                   })
+               }
             };
 
-            return cmd.Invoke(args);
+            ParseResult parseResult = cmd.Parse(args);
+            return parseResult.Invoke();
         }
     }
-#nullable disable
+
 
     static class Extensions
     {
-        public static Command WithHandler(this Command command, Delegate handlerFunc)
+        public static Command WithAction(this Command command, Action<ParseResult> action)
         {
-            command.Handler = Inv.CommandHandler.Create(handlerFunc!);
+            command.SetAction(action);
             return command;
         }
+
+        public static Command WithAction(this Command command, Func<ParseResult, int> action)
+        {
+            command.SetAction(action);
+            return command;
+        }
+        //Func<ParseResult, int> action
     }
 }

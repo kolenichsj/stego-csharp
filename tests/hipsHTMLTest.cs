@@ -13,19 +13,19 @@ namespace tests
         }
 
         [Test]
-        public void hideInHTML()
+        public void HideInHTML()
         {
             string[] resrcdir = Directory.GetDirectories(TestContext.CurrentContext.WorkDirectory, "resources", (new EnumerationOptions() { MatchCasing = MatchCasing.CaseSensitive }));
             string testResourcesDir = resrcdir[0];
-            var overt_inPath = System.IO.Path.Combine(testResourcesDir, "overt_1.html");
-            var overt_outPath = System.IO.Path.Combine(testResourcesDir, "overt_outPath.html");
-            var covert_Path = System.IO.Path.Combine(testResourcesDir, "covert_1.txt");
+            var overt_inPath = Path.Combine(testResourcesDir, "overt_1.html");
+            var overt_outPath = Path.Combine(testResourcesDir, "overt_outPath.html");
+            var covert_Path = Path.Combine(testResourcesDir, "covert_1.txt");
 
             hips.hipsHTML.hideInHTML(overt_inPath, overt_outPath, covert_Path);
-            FileStream file1 = new FileStream(overt_outPath, FileMode.Open, FileAccess.Read);
-            FileStream file2 = new FileStream(System.IO.Path.Combine(testResourcesDir, "tstCompare.html"), FileMode.Open, FileAccess.Read);
+            var file1 = new FileStream(overt_outPath, FileMode.Open, FileAccess.Read);
+            var file2 = new FileStream(System.IO.Path.Combine(testResourcesDir, "tstCompare.html"), FileMode.Open, FileAccess.Read);
 
-            Assert.True(Utils.FileCompare(file1, file2));
+            Assert.That(Utils.FileCompare(file1, file2));
         }
     }
 }
