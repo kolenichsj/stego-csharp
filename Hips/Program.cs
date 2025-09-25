@@ -2,7 +2,7 @@
 using System.CommandLine;
 using System.IO;
 
-namespace hips
+namespace Hips
 {
     class Program
     {
@@ -37,7 +37,7 @@ namespace hips
 
                        try
                        {
-                           hipsDOCX.InsertText(documentPath.FullName, covertText, hipsNamespace?? string.Empty);
+                           HipsDOCX.InsertText(documentPath.FullName, covertText, hipsNamespace?? string.Empty);
                            return 0;
                        }
                        catch (Exception ex)
@@ -72,7 +72,7 @@ namespace hips
 
                            try
                            {
-                               hipsDOCX.InsertText(sourceDocumentPath.FullName,destinationDocumentPath.FullName, covertText,hipsNamespace??string.Empty);
+                               HipsDOCX.InsertText(sourceDocumentPath.FullName,destinationDocumentPath.FullName, covertText,hipsNamespace??string.Empty);
                                return 0;
                            }
                            catch (Exception ex)
@@ -99,7 +99,7 @@ namespace hips
 
                            try
                            {
-                            hipsHTML.hideInHTML(sourceHTML.FullName,destinationHTML.FullName,covertPath.FullName);
+                               HipsHTML.hideInHTML(sourceHTML.FullName,destinationHTML.FullName,covertPath.FullName);
                                return 0;
                            }
                            catch (Exception ex)
@@ -130,7 +130,7 @@ namespace hips
 
                            try
                            {
-                           hipsDOCX.CreateFileInsertText(destinationDocumentPath.FullName, covertText,hipsNamespace?? string.Empty);
+                               HipsDOCX.CreateFileInsertText(destinationDocumentPath.FullName, covertText,hipsNamespace?? string.Empty);
                                return 0;
                            }
                            catch (Exception ex)
@@ -160,7 +160,7 @@ namespace hips
 
                        try
                        {
-                           Console.Out.Write(hipsDOCX.GetText(overtDOCX.FullName,hipsNamespace??string.Empty));
+                           Console.Out.Write(HipsDOCX.GetText(overtDOCX.FullName,hipsNamespace??string.Empty));
                            return 0;
                        }
                        catch (Exception ex)
@@ -175,24 +175,24 @@ namespace hips
                        new Argument<FileInfo>("covertPath"){Description = "Path to extract covert file." }
                    }
                   .WithAction(parseResult => {
-                       var overtHTML = parseResult.GetValue<FileInfo>("overtHTML");
-                       var covertPath = parseResult.GetValue<FileInfo>("covertPath");
-                       if (overtHTML==null || covertPath == null)
-                       {
-                           Console.Error.WriteLine("Value for argument overtDOCX is required");
-                           return 1;
-                       }
+                      var overtHTML = parseResult.GetValue<FileInfo>("overtHTML");
+                      var covertPath = parseResult.GetValue<FileInfo>("covertPath");
+                      if (overtHTML==null || covertPath == null)
+                      {
+                          Console.Error.WriteLine("Value for argument overtDOCX is required");
+                          return 1;
+                      }
 
-                       try
-                           {
-                       hipsHTML.getFromHTML(overtHTML.FullName,covertPath.FullName);
-                               return 0;
-                           }
-                           catch (Exception ex)
-                           {
-                               Console.Error.Write(ex.Message);
-                               return 1;
-                           }
+                      try
+                      {
+                          HipsHTML.getFromHTML(overtHTML.FullName,covertPath.FullName);
+                          return 0;
+                      }
+                      catch (Exception ex)
+                      {
+                          Console.Error.Write(ex.Message);
+                          return 1;
+                      }
                    })
                }
             };
@@ -216,6 +216,5 @@ namespace hips
             command.SetAction(action);
             return command;
         }
-        //Func<ParseResult, int> action
     }
 }

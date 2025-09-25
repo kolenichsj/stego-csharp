@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "hips", "hips\hips.csproj", "{47B684D2-9C56-4642-9FE9-EC38434C31EE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hips", "Hips\Hips.csproj", "{47B684D2-9C56-4642-9FE9-EC38434C31EE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\tests.csproj", "{0FD7EE9D-0BBB-456D-9FC5-AC39280C4941}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{0FD7EE9D-0BBB-456D-9FC5-AC39280C4941}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

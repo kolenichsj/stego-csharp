@@ -5,12 +5,12 @@ using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using Wp = DocumentFormat.OpenXml.Wordprocessing;
 
-namespace hips
+namespace Hips
 {
     /// <summary>
     /// Class to process DOCX documents to insert or retrieve covert data
     /// </summary>
-    public static class hipsDOCX
+    public static class HipsDOCX
     {
         const string wordmlNamespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main";
         const string mcNamespace = "http://schemas.openxmlformats.org/markup-compatibility/2006";
@@ -24,7 +24,7 @@ namespace hips
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
         public static void InsertText(string srcDocPath, string covertText, string hipsNamespace = "")
         {
-            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
+            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? HipsDOCX.hipsNamespace : hipsNamespace;
 
             using WordprocessingDocument wdDoc = WordprocessingDocument.Open(srcDocPath, true);
             var mainPart = wdDoc.MainDocumentPart ?? wdDoc.AddMainDocumentPart();
@@ -40,7 +40,7 @@ namespace hips
         /// <param name="hipsNamespace">Optional parameter to specify namespace for covert text</param>
         public static void InsertText(string srcDocPath, string dstDocPath, string covertText, string hipsNamespace = "")
         {
-            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
+            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? HipsDOCX.hipsNamespace : hipsNamespace;
             StringReader docPartReader;
             using (WordprocessingDocument wdDocSrc = WordprocessingDocument.Open(srcDocPath, false))
             {
@@ -98,7 +98,7 @@ namespace hips
                 new Wp.Body(
                     new Wp.Paragraph(
                         new Wp.Run())));
-            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
+            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? HipsDOCX.hipsNamespace : hipsNamespace;
             var xdoc = GenerateDocBodyXML(hipsNamespace, new StringReader(blankDoc.OuterXml), covertText);
 
             using (WordprocessingDocument wordDocument = WordprocessingDocument.Create(filePath, WordprocessingDocumentType.Document))
@@ -116,7 +116,7 @@ namespace hips
         /// <returns>Any text found in "t" element in the hipsNamespace</returns>
         public static string GetText(string docxPath, string hipsNamespace = "")
         {
-            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? hipsDOCX.hipsNamespace : hipsNamespace;
+            hipsNamespace = string.IsNullOrEmpty(hipsNamespace) ? HipsDOCX.hipsNamespace : hipsNamespace;
 
             using WordprocessingDocument wdDoc = WordprocessingDocument.Open(docxPath, false);
             NameTable nt = new NameTable();

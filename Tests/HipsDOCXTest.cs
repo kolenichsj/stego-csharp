@@ -1,11 +1,11 @@
 using NUnit.Framework;
 using System.IO;
 
-namespace tests
+namespace Tests
 {
     [SingleThreaded]
     [TestFixture]
-    public class hipsDOCXTest
+    public class HipsDOCXTest
     {
         [SetUp]
         public void Setup()
@@ -19,7 +19,7 @@ namespace tests
             var resrcdir = Directory.GetDirectories(TestContext.CurrentContext.WorkDirectory, "resources", (new EnumerationOptions() { MatchCasing = MatchCasing.CaseSensitive }));
             var testResourcesDir = resrcdir[0];
             var testcase_path = Path.Combine(testResourcesDir, "testcase" + testId.ToString() + ".docx");
-            var extract_text = hips.hipsDOCX.GetText(testcase_path, hipsNamespace);
+            var extract_text = Hips.HipsDOCX.GetText(testcase_path, hipsNamespace);
 
             Assert.That(covertText, Is.EqualTo(extract_text));
         }

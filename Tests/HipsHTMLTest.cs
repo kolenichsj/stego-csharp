@@ -4,7 +4,7 @@ using System.IO;
 namespace tests
 {
     [TestFixture]
-    public class hipsHTMLTest
+    public class HipsHTMLTest
     {
         [SetUp]
         public void Setup()
@@ -21,7 +21,7 @@ namespace tests
             var overt_outPath = Path.Combine(testResourcesDir, "overt_outPath.html");
             var covert_Path = Path.Combine(testResourcesDir, "covert_1.txt");
 
-            hips.hipsHTML.hideInHTML(overt_inPath, overt_outPath, covert_Path);
+            Hips.HipsHTML.hideInHTML(overt_inPath, overt_outPath, covert_Path);
             var file1 = new FileStream(overt_outPath, FileMode.Open, FileAccess.Read);
             var file2 = new FileStream(System.IO.Path.Combine(testResourcesDir, "tstCompare.html"), FileMode.Open, FileAccess.Read);
 

@@ -1,12 +1,12 @@
 using System.IO;
 
-namespace hips
+namespace Hips
 {
     /// <summary>
     /// Class to process HTML files to insert or retrieve covert data.
     /// Binary values are encoded with tabs (0) and spaces (1)
     /// </summary>
-    public static class hipsHTML
+    public static class HipsHTML
     {
         private const byte ONE = 32; // space
         private const byte ZERO = 9; // tab
